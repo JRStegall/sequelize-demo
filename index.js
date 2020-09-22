@@ -1,3 +1,4 @@
+const { response } = require('express');
 const express = require('express');
 const app = express();
 const session = require('express-session');
@@ -44,6 +45,21 @@ app.post('/sign-up', encryptPassword, function(req, res){
         res.send(user);
     })
 });
+
+app.post('/login', encryptPassword, function(req, res){
+    models.user.findOne({where: {username: req.body.username, password: req.body.password}})
+    .then(function (user){
+        if(user){
+        console.log("User found: ", user);
+        req.session.user = user;
+        res.send(user);
+        }else{
+            res.send("No user found");
+        }
+    }).catch(function (err){
+        res.send("There was an error.");
+    });
+})
 
 app.listen(process.env.PORT, function(){
     console.log(`My API is listening to port ${process.env.PORT}`)
